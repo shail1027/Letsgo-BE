@@ -3,8 +3,11 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import dotenv from 'dotenv';
+import passport from 'passport';
 import sequelize from './database.js';
 import authRoutes from './src/routes/auth.js';
+import googleAuthRoutes from './src/routes/googleAuth.js'; 
+import authenticateToken from './src/middleware/auth.js'; 
 
 // ESM 환경에서 __dirname 대체
 const __filename = fileURLToPath(import.meta.url);
@@ -19,6 +22,8 @@ app.use(express.urlencoded({ extended: true }));
 
 // 정적 파일 제공 설정 (업로드된 이미지 제공)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+app.use(passport.initialize());
 
 sequelize.authenticate()
   .then(() => {
@@ -37,6 +42,7 @@ sequelize.sync({ force: false })
   });
 
 app.use('/users', authRoutes);
+app.use('/users', googleAuthRoutes); 
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

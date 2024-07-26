@@ -19,3 +19,18 @@ export class RegisterDto {
     }
   }
   
+  export class GoogleProfileDto {
+    constructor(email, displayName, photos) {
+      this.email = email;
+      this.displayName = displayName;
+      this.photos = photos;
+    }
+  
+    static fromProfile(profile) {
+      return new GoogleProfileDto(
+        profile.emails[0].value,
+        profile.displayName,
+        profile.photos[0].value
+      );
+    }
+  }

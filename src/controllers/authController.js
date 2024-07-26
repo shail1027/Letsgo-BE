@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../models/user.js';
-import { RegisterDto, LoginDto, TokenDto } from '../dtos/authDto.js';
+import { RegisterDto, LoginDto, TokenDto, GoogleProfileDto } from '../dtos/authDto.js';
 
 export const register = async (req, res) => {
   const { email, password, confirmPassword } = new RegisterDto(req.body.email, req.body.password, req.body.confirmPassword);
@@ -159,5 +159,40 @@ export const changePassword = async (req, res) => {
     res.status(200).json({ message: 'Password changed successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+};
+
+export const googleLogin = async (profile) => {
+  const googleProfile = GoogleProfileDto.fromProfile(profile);
+
+  try {
+    const [user, created] = await User.findOrCreate({
+      where: { email: googleProfile.email },
+      defaults: {
+        email: googleProfile.email,
+        password: null,
+        name: googleProfile.displayName,
+        profile_image: googleProfile.photos,
+        access_at: new Date(),
+        created_at: new Date(),
+        updated_at: new Date(),
+        status: 1,
+      }
+    });
+
+    if (!created) {
+      user.access_at = new Date();
+      await user.save();
+    }
+
+    const accessToken = jwt.sign({ userId: user.user_id }, process.env.JWT_SECRET, { expiresIn: '15m' });
+    const refreshToken = jwt.sign({ userId: user.user_id }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
+
+    user.refresh_token = refreshToken;
+    await user.save();
+
+    return { accessToken, refreshToken };
+  } catch (error) {
+    throw new Error('Google login error: ' + error.message);
   }
 };
