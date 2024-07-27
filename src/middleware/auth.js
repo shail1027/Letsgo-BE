@@ -16,6 +16,7 @@ const authenticateToken = async (req, res, next) => {
     if (!req.user) {
       return res.sendStatus(403); // 사용자를 찾을 수 없는 경우
     }
+    console.log('Authenticated User:', req.user); // 디버깅 로그 추가
     next(); // 다음 미들웨어 또는 라우트로 이동
   } catch (err) {
     res.sendStatus(403); // 토큰이 유효하지 않은 경우
