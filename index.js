@@ -7,10 +7,11 @@ import passport from 'passport';
 import sequelize from './database.js';
 import authRoutes from './src/routes/auth.js';
 import googleAuthRoutes from './src/routes/googleAuth.js';
-import locationRoutes from './src/routes/locationRoutes.js'; // 추가된 location 라우트 import
-import User from './src/models/user.js';
-import TravelPlan from './src/models/travelPlan.js';
-import Location from './src/models/location.js'; // 필요하다면 모델을 불러오기
+import locationRoutes from './src/routes/locationRoutes.js'; 
+import travelPlansRoutes from './src/routes/travelPlans.js';
+import User from './src/models/user.js'; // Ensure models are imported
+import TravelPlan from './src/models/travelPlan.js'; // Ensure models are imported
+import FavoriteList from './src/models/FavoriteList.js'; // Ensure models are imported
 
 // ESM 환경에서 __dirname 대체
 const __filename = fileURLToPath(import.meta.url);
@@ -46,7 +47,8 @@ sequelize.sync({ alter: true })
 
 app.use('/users', authRoutes);
 app.use('/users', googleAuthRoutes);
-app.use('/location', locationRoutes); // 장소 정보 관련 라우트를 추가
+app.use('/travel-plans', locationRoutes); 
+app.use('/users', travelPlansRoutes);
 
 // 에러 핸들링 미들웨어 추가
 app.use((err, req, res, next) => {

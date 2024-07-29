@@ -1,6 +1,6 @@
+import Location from '../models/location.js';
 import axios from 'axios';
 import cheerio from 'cheerio';
-import Location from '../models/location.js';
 
 export const getLocationInfo = async (req, res) => {
     const { url, travel_id } = req.body;
@@ -40,5 +40,43 @@ export const getLocationInfo = async (req, res) => {
     } catch (error) {
         console.error('Error fetching the place info or saving to DB:', error);
         res.status(500).send({ error: 'Error fetching place information' });
+    }
+};
+
+// 새로운 장소 조회 함수 추가
+export const getLocations = async (req, res) => {
+    if (!req.user) {
+        return res.status(401).send({ error: 'User not authenticated' });
+    }
+
+    const user_id = req.user.dataValues.user_id;
+
+    try {
+        const locations = await Location.findAll({
+            where: { user_id }
+        });
+
+        res.status(200).send(locations);
+    } catch (error) {
+        console.error('Error fetching locations:', error);
+        res.status(500).send({ error: 'Error fetching locations' });
+    }
+};
+// 특정 사용자의 장소 조회 또는 전체 장소 조회
+export const getAllLocations = async (req, res) => {
+    const { user_id } = req.query;
+
+    let query = {};
+    if (user_id) {
+        query = { where: { user_id } };
+    }
+
+    try {
+        const locations = await Location.findAll(query);
+
+        res.status(200).send(locations);
+    } catch (error) {
+        console.error('Error fetching locations:', error);
+        res.status(500).send({ error: 'Error fetching locations' });
     }
 };
