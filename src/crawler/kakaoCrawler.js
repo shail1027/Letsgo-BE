@@ -14,6 +14,17 @@ export const fetchKakaoBookmarkList = async (url) => {
         console.log('Waiting for FavoriteDetailItem element to be located');
         await driver.wait(until.elementLocated(By.css('ul.list_body li.FavoriteDetailItem')), 10000);
 
+        console.log('Finding list name element');
+        let listName = '';
+        try {
+            const listNameElement = await driver.findElement(By.css('h4.tit_summary'));
+            listName = await listNameElement.getText();
+        } catch (error) {
+            console.error('Error fetching the list name element:', error);
+        }
+
+        console.log('List name:', listName);
+
         console.log('Finding place name and address elements');
         const places = await driver.findElements(By.css('ul.list_body li.FavoriteDetailItem'));
         const placeList = [];
@@ -32,18 +43,20 @@ export const fetchKakaoBookmarkList = async (url) => {
         }
 
         console.log('Places:', placeList);
-        return placeList;
+        return { listName, placeList };
     } catch (error) {
         console.error('Error fetching the bookmark list:', error);
-        return [];
+        return { listName: '', placeList: [] };
     } finally {
         await driver.quit();
     }
 }
 
 export const saveKakaoBookmarkList = async (saveKakaoBookmarkDto) => {
-    const { url, userId, listName, listId } = saveKakaoBookmarkDto;
-    const placeList = await fetchKakaoBookmarkList(url);
+    const { url, userId, listName: inputListName, listId } = saveKakaoBookmarkDto;
+    const { listName: fetchedListName, placeList } = await fetchKakaoBookmarkList(url);
+
+    const listName = inputListName || fetchedListName;
 
     if (placeList && placeList.length > 0) {
         // 기존 리스트 확인

@@ -8,10 +8,10 @@ import sequelize from './database.js';
 import authRoutes from './src/routes/auth.js';
 import googleAuthRoutes from './src/routes/googleAuth.js';
 import locationRoutes from './src/routes/locationRoutes.js'; 
-import travelPlansRoutes from './src/routes/travelPlans.js';
-import User from './src/models/user.js'; // Ensure models are imported
-import TravelPlan from './src/models/travelPlan.js'; // Ensure models are imported
-import FavoriteList from './src/models/FavoriteList.js'; // Ensure models are imported
+import TravelPlanRoutes from './src/routes/travelPlans.js';
+import User from './src/models/user.js'; 
+import TravelPlan from './src/models/travelPlan.js'; 
+import FavoriteList from './src/models/FavoriteList.js'; 
 
 // ESM 환경에서 __dirname 대체
 const __filename = fileURLToPath(import.meta.url);
@@ -48,7 +48,7 @@ sequelize.sync({ alter: true })
 app.use('/users', authRoutes);
 app.use('/users', googleAuthRoutes);
 app.use('/travel-plans', locationRoutes); 
-app.use('/users', travelPlansRoutes);
+app.use('/', TravelPlanRoutes);
 
 // 에러 핸들링 미들웨어 추가
 app.use((err, req, res, next) => {

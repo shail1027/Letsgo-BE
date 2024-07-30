@@ -1,6 +1,7 @@
 import { saveKakaoBookmarkList, fetchKakaoBookmarkList } from '../crawler/kakaoCrawler.js';
 import MyPlaceList from '../models/myPlaceList.js';
 import MyPlaceListMapping from '../models/MyPlaceListMapping.js';
+import FavoriteList from '../models/FavoriteList.js'; // 추가
 import { SaveKakaoBookmarkDto, UserListDto, ListDetailsDto, PlaceDto } from '../dtos/travelPlansDto.js';
 
 export const createKakaoBookmarks = async (req, res) => {
@@ -12,12 +13,9 @@ export const createKakaoBookmarks = async (req, res) => {
     }
 
     try {
-        const userLists = await MyPlaceList.findAll({ where: { user_id: userId } });
-        const listCount = userLists.length;
-        const listName = `즐겨찾기${listCount + 1}`;
-        const saveKakaoBookmarkDto = new SaveKakaoBookmarkDto(kakaoMapUrl, userId, listName);
-
+        const saveKakaoBookmarkDto = new SaveKakaoBookmarkDto(kakaoMapUrl, userId, ''); // 리스트 이름을 빈 문자열로 초기화
         const result = await saveKakaoBookmarkList(saveKakaoBookmarkDto);
+
         res.json(result);
     } catch (error) {
         res.status(500).send(error.message);
@@ -118,6 +116,89 @@ export const updateKakaoBookmarks = async (req, res) => {
         }
 
         res.json({ message: 'Places updated successfully', placeList });
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+};
+
+export const addPlaceToFavoriteList = async (req, res) => {
+    const listId = req.body.listId;
+    const userId = req.user.user_id;
+
+    try {
+        // 리스트 상세 정보 조회
+        const list = await MyPlaceList.findByPk(listId, {
+            include: [MyPlaceListMapping]
+        });
+
+        if (!list) {
+            return res.status(404).send('List not found');
+        }
+
+        // favoritelist 테이블에 저장
+        for (const mapping of list.MyPlaceListMappings) {
+            await FavoriteList.create({
+                user_id: userId,
+                travel_id: listId,
+                list_name: list.list_name,
+                place_name: mapping.place_name,
+                address: mapping.address
+            });
+        }
+
+        res.status(201).send('Places added to favorite list successfully');
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+};
+
+export const getFavoriteList = async (req, res) => {
+    const userId = req.params.userId;
+
+    try {
+        console.log('Requested user ID:', userId); // 디버깅용 로그
+        const favoriteLists = await FavoriteList.findAll({
+            where: { user_id: userId }
+        });
+
+        if (favoriteLists.length === 0) {
+            return res.status(404).send('No favorite lists found');
+        }
+
+        res.json(favoriteLists);
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+};
+
+export const getAllFavoriteLists = async (req, res) => {
+    try {
+        const favoriteLists = await FavoriteList.findAll();
+
+        if (favoriteLists.length === 0) {
+            return res.status(404).send('No favorite lists found');
+        }
+
+        res.json(favoriteLists);
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+};
+
+// 현재 사용자의 즐겨찾기 목록 조회
+export const getMyFavoriteList = async (req, res) => {
+    const userId = req.user.user_id;
+
+    try {
+        const favoriteLists = await FavoriteList.findAll({
+            where: { user_id: userId }
+        });
+
+        if (favoriteLists.length === 0) {
+            return res.status(404).send('No favorite lists found');
+        }
+
+        res.json(favoriteLists);
     } catch (error) {
         res.status(500).send(error.message);
     }
