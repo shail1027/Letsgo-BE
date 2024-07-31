@@ -121,12 +121,41 @@ export const updateKakaoBookmarks = async (req, res) => {
     }
 };
 
+// export const addPlaceToFavoriteList = async (req, res) => {
+//     const listId = req.body.listId;
+//     const userId = req.user.user_id;
+
+//     try {
+//         // 리스트 상세 정보 조회
+//         const list = await MyPlaceList.findByPk(listId, {
+//             include: [MyPlaceListMapping]
+//         });
+
+//         if (!list) {
+//             return res.status(404).send('List not found');
+//         }
+
+//         // favoritelist 테이블에 저장
+//         for (const mapping of list.MyPlaceListMappings) {
+//             await FavoriteList.create({
+//                 user_id: userId,
+//                 travel_id: listId,
+//                 list_name: list.list_name,
+//                 place_name: mapping.place_name,
+//                 address: mapping.address
+//             });
+//         }
+
+//         res.status(201).send('Places added to favorite list successfully');
+//     } catch (error) {
+//         res.status(500).send(error.message);
+//     }
+// };
 export const addPlaceToFavoriteList = async (req, res) => {
-    const listId = req.body.listId;
+    const { listId, travelId, listName } = req.body;  // 올바르게 변수를 추출하고 있는지 확인
     const userId = req.user.user_id;
 
     try {
-        // 리스트 상세 정보 조회
         const list = await MyPlaceList.findByPk(listId, {
             include: [MyPlaceListMapping]
         });
@@ -135,12 +164,11 @@ export const addPlaceToFavoriteList = async (req, res) => {
             return res.status(404).send('List not found');
         }
 
-        // favoritelist 테이블에 저장
         for (const mapping of list.MyPlaceListMappings) {
             await FavoriteList.create({
                 user_id: userId,
-                travel_id: listId,
-                list_name: list.list_name,
+                travel_id: travelId,  // 올바르게 travelId를 사용하고 있는지 확인
+                list_name: listName,
                 place_name: mapping.place_name,
                 address: mapping.address
             });
@@ -186,12 +214,35 @@ export const getAllFavoriteLists = async (req, res) => {
 };
 
 // 현재 사용자의 즐겨찾기 목록 조회
+// export const getMyFavoriteList = async (req, res) => {
+//     const userId = req.user.user_id;
+
+//     try {
+//         const favoriteLists = await FavoriteList.findAll({
+//             where: { user_id: userId }
+//         });
+
+//         if (favoriteLists.length === 0) {
+//             return res.status(404).send('No favorite lists found');
+//         }
+
+//         res.json(favoriteLists);
+//     } catch (error) {
+//         res.status(500).send(error.message);
+//     }
+// };
 export const getMyFavoriteList = async (req, res) => {
     const userId = req.user.user_id;
+    const { listName } = req.query; // listName을 쿼리 파라미터로 받습니다.
 
     try {
+        const whereClause = {
+            user_id: userId,
+            ...(listName && { list_name: listName }) // Optional: listName이 제공된 경우에만 where 절에 포함
+        };
+
         const favoriteLists = await FavoriteList.findAll({
-            where: { user_id: userId }
+            where: whereClause
         });
 
         if (favoriteLists.length === 0) {
@@ -199,6 +250,24 @@ export const getMyFavoriteList = async (req, res) => {
         }
 
         res.json(favoriteLists);
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+};
+export const deleteFavoriteList = async (req, res) => {
+    const { listName } = req.params; // 클라이언트가 listName을 통해 삭제하길 원할 때
+    const userId = req.user.user_id;
+
+    try {
+        const result = await FavoriteList.destroy({
+            where: { user_id: userId, list_name: listName }
+        });
+
+        if (result === 0) {
+            return res.status(404).send('No favorite lists found to delete');
+        }
+
+        res.status(200).send('Favorite lists deleted successfully');
     } catch (error) {
         res.status(500).send(error.message);
     }

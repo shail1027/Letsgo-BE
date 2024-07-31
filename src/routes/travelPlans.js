@@ -1,5 +1,5 @@
 import express from 'express';
-import { createKakaoBookmarks, getUserLists, getListDetails, deleteList, updateKakaoBookmarks, addPlaceToFavoriteList, getFavoriteList, getAllFavoriteLists, getMyFavoriteList } from '../controllers/travelPlansController.js';
+import { createKakaoBookmarks, getUserLists, getListDetails, deleteList, updateKakaoBookmarks, addPlaceToFavoriteList, getFavoriteList, getAllFavoriteLists, getMyFavoriteList,deleteFavoriteList } from '../controllers/travelPlansController.js';
 import authenticateToken from '../middleware/auth.js';
 
 const router = express.Router();
@@ -12,6 +12,7 @@ router.delete('/users/lists/:listId', authenticateToken, deleteList); // 리스�
 router.post('/travel-plans/add-place', authenticateToken, addPlaceToFavoriteList); // 리스트의 장소를 즐겨찾기에 추가
 router.get('/travel-plans/favorite-list/:userId', authenticateToken, getFavoriteList); // 특정 사용자의 즐겨찾기 목록 조회
 router.get('/travel-plans/all-favorite-lists', authenticateToken, getAllFavoriteLists); // 모든 사용자의 즐겨찾기 목록 조회
-router.get('/travel-plans/favorite-list', authenticateToken, getMyFavoriteList); // 현재 사용자의 즐겨찾기 목록 조회
+router.get('/travel-plans/my-favorite-list', authenticateToken, getMyFavoriteList); // listName 기반으로 즐겨찾기 리스트 조회
+router.delete('/travel-plans/favorite-list/:listName', authenticateToken, deleteFavoriteList); // listName 기반으로 즐겨찾기 리스트 삭제
 
 export default router;
