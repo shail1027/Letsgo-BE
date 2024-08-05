@@ -1,6 +1,6 @@
 import express from 'express';
 import Candidate from '../models/candidate.js';
-import Location from '../models/Location.js';
+import Location from '../models/location.js';
 
 const router = express.Router();
 

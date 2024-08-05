@@ -6,7 +6,9 @@ import dotenv from 'dotenv';
 import passport from 'passport';
 import morgan from 'morgan';
 import sequelize from './database.js';
+
 import authRoutes from './src/routes/auth.js';
+import CandidateRoutes from './src/routes/CreateCan.js';
 import googleAuthRoutes from './src/routes/googleAuth.js';
 import locationRoutes from './src/routes/locationRoutes.js';
 import travelPlanRoutes from './src/routes/travelPlans.js';
@@ -15,7 +17,7 @@ import travelPlanRoutes from './src/routes/travelPlans.js';
 import './src/models/user.js';
 import './src/models/travelPlan.js';
 import './src/models/FavoriteList.js';
-import './src/models/Location.js';
+import './src/models/location.js';
 import './src/models/Candidates.js';
 import './src/models/myPlaceList.js';
 import './src/models/MyPlaceListMapping.js';
@@ -58,6 +60,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use(passport.initialize());
 
+// 라우터
 app.use('/users', authRoutes);
 app.use('/users', googleAuthRoutes);
 app.use('/travel-plans', locationRoutes);
@@ -76,6 +79,11 @@ app.use((err, req, res, next) => {
   res.locals.error = process.env.NODE_ENV !== 'production' ? err : {};
   res.status(err.status || 500);
   res.render('error');
+});
+
+app.get('/gabolkka', (deq, res)=> {
+  console.log("/gabolkka");
+  res.send('gabolkka');
 });
 
 const PORT = process.env.PORT || 3000;

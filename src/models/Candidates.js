@@ -1,5 +1,9 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../../database.js';
+import MPLM from './MyPlaceListMapping.js';  // MyPlaceListMapping 모델을 불러옵니다.
+import Location from './location.js';         // Location 모델을 불러옵니다.
+import TravelPlan from './travelPlan.js';     // TravelPlan 모델을 불러옵니다.
+import User from './user.js';                 // User 모델을 불러옵니다.
 
 const Candidate = sequelize.define('Candidate', {
   can_id: {
@@ -14,28 +18,28 @@ const Candidate = sequelize.define('Candidate', {
   location_id: {
     type: DataTypes.INTEGER,
     references: {
-      model: 'locations',
+      model: Location,  // Location 모델을 참조합니다.
       key: 'location_id'
     }
   },
   travel_id: {
     type: DataTypes.INTEGER,
     references: {
-      model: 'travelPlan', // Travel 모델을 올바르게 참조해야 합니다.
+      model: TravelPlan,  // TravelPlan 모델을 참조합니다.
       key: 'travel_id'
     }
   },
   user_id: {
     type: DataTypes.INTEGER,
     references: {
-      model: 'users', // User 모델을 올바르게 참조해야 합니다.
+      model: User,  // User 모델을 참조합니다.
       key: 'user_id'
     }
   },
   list_id: {
     type: DataTypes.INTEGER,
     references: {
-      model: 'MyPlaceListMapping',
+      model: MPLM,  // MyPlaceListMapping 모델을 참조합니다.
       key: 'list_id'
     }
   }

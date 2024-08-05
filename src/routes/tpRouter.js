@@ -12,5 +12,4 @@ router.post('/travel-plans/:travel_id/detail', authenticateToken, updateTravelPl
 
 // 숙소 관련 엔드포인트
 
-
 export default router;

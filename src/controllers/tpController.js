@@ -1,9 +1,7 @@
-import jwt from 'jsonwebtoken';
-
 import User_TravelPlan from '../models/user_travelPlan.js';
 import TravelPlan from '../models/travelPlan.js';
-import Accommodation from '../models/accommodation.js';
-import Location from '../models/Location.js';
+import Accommodation from '../models/accommodation.js';``
+import Location from '../models/location.js';
 import TravelRoute from '../models/travelRoute.js';
 
 import { TravelPlanDto, TravelPlanListDto, AccomodationsDTO, TravelRouteDTO } from '../dtos/travelPlansDto.js';
@@ -98,7 +96,7 @@ export const getAccomodations = async (req, res) => {
 };
 
 // 숙소 등록
-export const addAccomodations = async (req, res) => {
+export const addAccomodations = async (req, res) => {``
 
 };
 

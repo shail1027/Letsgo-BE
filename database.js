@@ -3,12 +3,9 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const sequelize = new Sequelize({
+const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
   host: process.env.DB_HOST,
   dialect: process.env.DB_DIALECT,
-  username: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME, // 데이터베이스 이름 추가
   logging: false
 });
 
