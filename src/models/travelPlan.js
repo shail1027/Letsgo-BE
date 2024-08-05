@@ -8,6 +8,14 @@ const TravelPlan = sequelize.define('TravelPlan', {
     primaryKey: true,
     autoIncrement: true
   },
+  user_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: User,
+      key: 'user_id'
+    }
+  },
   title: {
     type: DataTypes.STRING,
     allowNull: false
@@ -27,7 +35,6 @@ const TravelPlan = sequelize.define('TravelPlan', {
   status: {
     type: DataTypes.TINYINT,
     allowNull: false
-    // defaultValue: 0
   },
   created_at: {
     type: DataTypes.DATE,
@@ -52,11 +59,20 @@ const TravelPlan = sequelize.define('TravelPlan', {
     allowNull: true
   },
   travel_image: {
-    type: DataTypes.TEXT
+    type: DataTypes.TEXT,
+    allowNull: true
   }
 }, {
   tableName: 'TravelPlan',
   timestamps: false
+});
+
+// 모델 간의 관계를 설정합니다.
+User.hasMany(TravelPlan, {
+  foreignKey: 'user_id'
+});
+TravelPlan.belongsTo(User, {
+  foreignKey: 'user_id'
 });
 
 export default TravelPlan;
