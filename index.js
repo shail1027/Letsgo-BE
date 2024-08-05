@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import dotenv from 'dotenv';
 import passport from 'passport';
+import morgan from 'morgan';
 import sequelize from './database.js';
 import authRoutes from './src/routes/auth.js';
 import googleAuthRoutes from './src/routes/googleAuth.js';
@@ -13,21 +14,15 @@ import User from './src/models/user.js';
 import TravelPlan from './src/models/travelPlan.js'; 
 import FavoriteList from './src/models/FavoriteList.js'; 
 
+dotenv.config();
+
 // ESM 환경에서 __dirname 대체
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-dotenv.config();
-
 const app = express();
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// 정적 파일 제공 설정 (업로드된 이미지 제공)
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-app.use(passport.initialize());
+app.set('port', process.env.PORT || 3001);
 
 sequelize.authenticate()
   .then(() => {
@@ -45,15 +40,33 @@ sequelize.sync({ alter: true })
     console.error('모델 동기화 오류:', err);
   });
 
+app.use(morgan('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// 정적 파일 제공 설정 (업로드된 이미지 제공)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+app.use(passport.initialize());
+
 app.use('/users', authRoutes);
 app.use('/users', googleAuthRoutes);
 app.use('/travel-plans', locationRoutes); 
 app.use('/', TravelPlanRoutes);
 
+// 라우터가 없는 경우에 대한 처리
+app.use((req, res, next) => {
+  const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`);
+  error.status = 404;
+  next(error);
+});
+
 // 에러 핸들링 미들웨어 추가
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('Something broke!');
+  res.locals.message = err.message;
+  res.locals.error = process.env.NODE_ENV !== 'production' ? err : {};
+  res.status(err.status || 500);
+  res.render('error');
 });
 
 const PORT = process.env.PORT || 3000;

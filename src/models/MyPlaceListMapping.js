@@ -2,6 +2,7 @@ import { DataTypes } from 'sequelize';
 import sequelize from '../../database.js';
 import User from './user.js';
 import MyPlaceList from './myPlaceList.js';  // MyPlaceList 모델 import
+import Candidate from "./Candidates.js"; // Candidate 모델 import
 
 // MyPlaceListMapping 모델 정의
 const MyPlaceListMapping = sequelize.define('MyPlaceListMapping', {
@@ -26,10 +27,12 @@ const MyPlaceListMapping = sequelize.define('MyPlaceListMapping', {
   },
   place_name: {
     type: DataTypes.STRING,
+    allowNull: false,
   },
   address: {
     type: DataTypes.STRING,
-  },
+    allowNull: false,
+  }
 }, {
   tableName: 'MyPlaceListMapping',
   timestamps: false,
@@ -43,5 +46,7 @@ MyPlaceListMapping.belongsTo(MyPlaceList, { foreignKey: 'list_id' });
 User.hasMany(MyPlaceListMapping, { foreignKey: 'user_id' });
 MyPlaceListMapping.belongsTo(User, { foreignKey: 'user_id' });
 
+MyPlaceListMapping.belongsTo(Candidate, { foreignKey: 'list_id' });
+MyPlaceListMapping.belongsTo(Candidate, { foreignKey: 'user_id' });
 
 export default MyPlaceListMapping;
