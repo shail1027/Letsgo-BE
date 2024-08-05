@@ -1,6 +1,6 @@
 import { Sequelize, DataTypes } from 'sequelize';
 import sequelize from '../../database.js';
-import User from '../models/user.js'; // User 모델을 임포트합니다.
+import User from '../models/user.js';
 
 const TravelPlan = sequelize.define('TravelPlan', {
   travel_id: {
@@ -57,6 +57,10 @@ const TravelPlan = sequelize.define('TravelPlan', {
   end_time: {
     type: DataTypes.TIME,
     allowNull: true
+  },
+  travel_image: {
+    type: DataTypes.TEXT,
+    allowNull: true
   }
 }, {
   tableName: 'TravelPlan',
@@ -70,6 +74,5 @@ User.hasMany(TravelPlan, {
 TravelPlan.belongsTo(User, {
   foreignKey: 'user_id'
 });
-
 
 export default TravelPlan;
