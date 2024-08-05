@@ -1,5 +1,5 @@
 import { DataTypes } from 'sequelize';
-import sequelize from '../database.js';
+import sequelize from '../../database.js';
 import Candidate from './candidate.js';
 import User from './user.js';
 
