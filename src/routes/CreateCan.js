@@ -1,5 +1,5 @@
 import express from 'express';
-import Candidate from '../models/candidate.js';
+import Candidate from '../models/Candidates.js';
 import Location from '../models/location.js';
 
 const router = express.Router();

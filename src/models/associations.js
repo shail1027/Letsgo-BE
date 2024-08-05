@@ -1,5 +1,5 @@
 import MyPlaceListMapping from './MyPlaceListMapping.js';
-import Location from './Location.js';
+import Location from './location.js';
 import Candidate from './Candidates.js';
 import User from './user.js';
 import MyPlaceList from './myPlaceList.js';
