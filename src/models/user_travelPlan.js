@@ -1,11 +1,9 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../../database.js';
-
 import User from './user.js';
 import TravelPlan from './travelPlan.js';
 
-const UserTravelPan = sequelize.define('UserTravelPan', {
-  // 기획자
+const UserTravelPlan = sequelize.define('UserTravelPlan', {
   user_id: {
     type: DataTypes.INTEGER,
     references: {
@@ -21,11 +19,11 @@ const UserTravelPan = sequelize.define('UserTravelPan', {
     }
   }
 }, {
-    tableName: 'userTravel',
-    timestamps: true
+  tableName: 'userTravelPlan',
+  timestamps: true
 });
 
-User.belongsToMany(TravelPlan, { through: UserTravelPan, foreignKey: 'user_id' });
-TravelPlan.belongsToMany(User, { through: UserTravelPan, foreignKey: 'travel_id' });
+User.belongsToMany(TravelPlan, { through: UserTravelPlan, foreignKey: 'user_id' });
+TravelPlan.belongsToMany(User, { through: UserTravelPlan, foreignKey: 'travel_id' });
 
-module.exports = UserTravelPan;
+export default UserTravelPlan;

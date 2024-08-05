@@ -1,10 +1,6 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../../database.js';
-import User from './user.js';
-import MyPlaceList from './myPlaceList.js';  // MyPlaceList 모델 import
-import Candidate from "./Candidates.js"; // Candidate 모델 import
 
-// MyPlaceListMapping 모델 정의
 const MyPlaceListMapping = sequelize.define('MyPlaceListMapping', {
   mapping_id: {
     type: DataTypes.INTEGER,
@@ -14,14 +10,14 @@ const MyPlaceListMapping = sequelize.define('MyPlaceListMapping', {
   list_id: {
     type: DataTypes.INTEGER,
     references: {
-      model: MyPlaceList,
+      model: 'myPlaceList',
       key: 'list_id',
     },
   },
   user_id: {
     type: DataTypes.INTEGER,
     references: {
-      model: User,
+      model: 'users', // 'User' 모델이 사용하는 테이블 이름과 일치해야 합니다.
       key: 'user_id',
     },
   },
@@ -38,15 +34,5 @@ const MyPlaceListMapping = sequelize.define('MyPlaceListMapping', {
   timestamps: false,
   underscored: true,
 });
-
-// 관계 정의
-MyPlaceList.hasMany(MyPlaceListMapping, { foreignKey: 'list_id' });
-MyPlaceListMapping.belongsTo(MyPlaceList, { foreignKey: 'list_id' });
-
-User.hasMany(MyPlaceListMapping, { foreignKey: 'user_id' });
-MyPlaceListMapping.belongsTo(User, { foreignKey: 'user_id' });
-
-MyPlaceListMapping.belongsTo(Candidate, { foreignKey: 'list_id' });
-MyPlaceListMapping.belongsTo(Candidate, { foreignKey: 'user_id' });
 
 export default MyPlaceListMapping;

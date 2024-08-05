@@ -42,7 +42,7 @@ export const login = async (req, res) => {
       return res.status(400).json({ error: 'Invalid email or password' });
     }
 
-    const accessToken = jwt.sign({ userId: user.user_id }, process.env.JWT_SECRET, { expiresIn: '15m' });
+    const accessToken = jwt.sign({ userId: user.user_id }, process.env.JWT_SECRET, { expiresIn: '30m' });
     const refreshToken = jwt.sign({ userId: user.user_id }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
 
     user.refresh_token = refreshToken;

@@ -8,11 +8,22 @@ import morgan from 'morgan';
 import sequelize from './database.js';
 import authRoutes from './src/routes/auth.js';
 import googleAuthRoutes from './src/routes/googleAuth.js';
-import locationRoutes from './src/routes/locationRoutes.js'; 
-import TravelPlanRoutes from './src/routes/travelPlans.js';
-import User from './src/models/user.js'; 
-import TravelPlan from './src/models/travelPlan.js'; 
-import FavoriteList from './src/models/FavoriteList.js'; 
+import locationRoutes from './src/routes/locationRoutes.js';
+import travelPlanRoutes from './src/routes/travelPlans.js';
+
+// 모델 파일들
+import './src/models/user.js';
+import './src/models/travelPlan.js';
+import './src/models/FavoriteList.js';
+import './src/models/Location.js';
+import './src/models/Candidates.js';
+import './src/models/myPlaceList.js';
+import './src/models/MyPlaceListMapping.js';
+import './src/models/accommodation.js';
+import './src/models/travelRoute.js';
+import './src/models/user_travelPlan.js';
+import './src/models/vote.js';
+import './src/models/associations.js'; // 관계 설정 파일
 
 dotenv.config();
 
@@ -22,8 +33,6 @@ const __dirname = dirname(__filename);
 
 const app = express();
 
-app.set('port', process.env.PORT || 3001);
-
 sequelize.authenticate()
   .then(() => {
     console.log('데이터베이스에 연결되었습니다.');
@@ -32,7 +41,7 @@ sequelize.authenticate()
     console.error('데이터베이스 연결 오류:', err);
   });
 
-sequelize.sync({ alter: true }) 
+sequelize.sync({ alter: true })
   .then(() => {
     console.log('모든 모델이 동기화되었습니다.');
   })
@@ -51,8 +60,8 @@ app.use(passport.initialize());
 
 app.use('/users', authRoutes);
 app.use('/users', googleAuthRoutes);
-app.use('/travel-plans', locationRoutes); 
-app.use('/', TravelPlanRoutes);
+app.use('/travel-plans', locationRoutes);
+app.use('/', travelPlanRoutes);
 
 // 라우터가 없는 경우에 대한 처리
 app.use((req, res, next) => {

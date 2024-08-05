@@ -8,6 +8,7 @@ const sequelize = new Sequelize({
   dialect: process.env.DB_DIALECT,
   username: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME, // 데이터베이스 이름 추가
   logging: false
 });
 
@@ -30,4 +31,5 @@ const createDatabase = async () => {
   }
 };
 
-export { sequelize, createDatabase };
+export default sequelize;
+export { createDatabase };

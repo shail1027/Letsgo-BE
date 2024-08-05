@@ -6,8 +6,8 @@ import TravelPlan from './travelPlan.js';
 const Location = sequelize.define('Location', {
   location_id: {
     type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true
+    autoIncrement: true,
+    primaryKey: true
   },
   travel_id: {
     type: DataTypes.INTEGER,
@@ -36,9 +36,13 @@ const Location = sequelize.define('Location', {
   location_img: {
     type: DataTypes.TEXT,
     allowNull: true
+  },
+  list_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true
   }
 }, {
-  tableName: 'Location',
+  tableName: 'locations', // 테이블 이름 소문자 복수형
   timestamps: false
 });
 

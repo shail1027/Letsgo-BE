@@ -1,6 +1,6 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../../database.js';
-import Candidate from './candidate.js';
+import Candidate from './Candidates.js';
 import User from './user.js';
 
 const Vote = sequelize.define('Vote', {
@@ -14,7 +14,7 @@ const Vote = sequelize.define('Vote', {
     allowNull: false,
     references: {
       model: Candidate,
-      key: 'candidate_id'
+      key: 'can_id'
     }
   },
   user_id: {
