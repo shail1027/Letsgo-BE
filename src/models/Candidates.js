@@ -1,5 +1,5 @@
 import { DataTypes } from 'sequelize';
-import sequelize from '../database.js';
+import sequelize from '../../database.js';
 import MPLM from './MyPlaceListMapping.js';
 import Location from './Location.js';
 
