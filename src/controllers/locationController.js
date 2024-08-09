@@ -1,4 +1,4 @@
-import Location from '../models/Location.js';
+import Location from '../models/location.js';
 import axios from 'axios';
 import cheerio from 'cheerio';
 
