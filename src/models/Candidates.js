@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../../database.js';
 import MPLM from './MyPlaceListMapping.js';  // MyPlaceListMapping 모델을 불러옵니다.
-import Location from './location.js';         // Location 모델을 불러옵니다.
+import Location from './Location.js';         // Location 모델을 불러옵니다.
 import TravelPlan from './travelPlan.js';     // TravelPlan 모델을 불러옵니다.
 import User from './user.js';                 // User 모델을 불러옵니다.
 
