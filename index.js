@@ -1,12 +1,14 @@
 import express from 'express';
-import bodyParser from 'body-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import dotenv from 'dotenv';
 import passport from 'passport';
 import morgan from 'morgan';
+import cors from 'cors'; 
 import sequelize from './database.js';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 
 import authRoutes from './src/routes/auth.js';
 import CandidateRoutes from './src/routes/CreateCan.js';
@@ -15,6 +17,7 @@ import locationRoutes from './src/routes/locationRoutes.js';
 import travelPlanRoutes from './src/routes/travelPlans.js';
 import makeRoomRoutes from './src/routes/makeRoomRoutes.js';
 import accommodationRoutes from './src/routes/accommodationRoutes.js';
+import inviteRoutes from './src/routes/inviteRoutes.js';
 
 // 모델 파일들
 import './src/models/user.js';
@@ -37,7 +40,42 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
-app.use(bodyParser.json());
+const server = createServer(app);
+const io = new Server(server, {
+  cors: {
+      origin: "http://localhost:3000",  
+      methods: ["GET", "POST"],          
+  }
+});
+
+
+app.set('socketio', io);
+
+app.use(cors()); 
+
+// Serve static files
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Handle socket connections
+io.on('connection', (socket) => {
+    console.log('A user connected');
+
+    // Join a room based on travel_id
+    socket.on('joinRoom', (travel_id) => {
+        socket.join(travel_id);
+        console.log(`User joined room: ${travel_id}`);
+    });
+
+    // Handle messages sent to a specific room
+    socket.on('message', ({ travel_id, message }) => {
+        io.to(travel_id).emit('message', message);
+        console.log(`Message sent to room ${travel_id}: ${message}`);
+    });
+
+    socket.on('disconnect', () => {
+        console.log('User disconnected');
+    });
+});
 
 sequelize.authenticate()
   .then(() => {
@@ -71,6 +109,12 @@ app.use('/travel-plans', locationRoutes);
 app.use('/', travelPlanRoutes);
 app.use('/travel-plans', makeRoomRoutes);
 app.use('/travel-plans', accommodationRoutes);
+app.use('/', inviteRoutes);
+
+// `GET /` 요청에 대한 기본 응답을 설정합니다.
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // 라우터가 없는 경우에 대한 처리
 app.use((req, res, next) => {
@@ -80,19 +124,14 @@ app.use((req, res, next) => {
 });
 
 // 에러 핸들링 미들웨어 추가
-// 수정된 코드 - 템플릿 엔진 사용하지 않음
 app.use((err, req, res, next) => {
   res.status(err.status || 500).json({
     message: err.message,
     error: process.env.NODE_ENV !== 'production' ? err : {}
   });
 });
-app.get('/gabolkka', (deq, res)=> {
-  console.log("/gabolkka");
-  res.send('gabolkka');
-});
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
