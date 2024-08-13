@@ -23,7 +23,7 @@ import inviteRoutes from './src/routes/inviteRoutes.js';
 import './src/models/user.js';
 import './src/models/travelPlan.js';
 import './src/models/FavoriteList.js';
-import './src/models/location.js';
+import './src/models/Location.js';
 import './src/models/Candidates.js';
 import './src/models/myPlaceList.js';
 import './src/models/MyPlaceListMapping.js';
