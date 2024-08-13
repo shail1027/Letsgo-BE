@@ -2,7 +2,7 @@ import { DataTypes } from 'sequelize';
 import sequelize from '../../database.js';
 import User from './user.js';  // User 모델을 import
 
-const MyPlaceList = sequelize.define('MyPlaceList', {
+const MyPlaceList = sequelize.define('myplacelist', {
   list_id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
@@ -29,7 +29,7 @@ const MyPlaceList = sequelize.define('MyPlaceList', {
     allowNull: false,
   },
 }, {
-  tableName: 'MyPlaceList',
+  tableName: 'myplacelist',
   timestamps: false,
   underscored: true,
 });

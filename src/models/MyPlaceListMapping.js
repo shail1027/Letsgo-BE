@@ -10,7 +10,7 @@ const MyPlaceListMapping = sequelize.define('MyPlaceListMapping', {
   list_id: {
     type: DataTypes.INTEGER,
     references: {
-      model: 'myPlaceList',
+      model: 'myplacelist',
       key: 'list_id',
     },
   },

@@ -21,7 +21,7 @@ const FavoriteList = sequelize.define('FavoriteList', {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: 'travelplan', // refers to table name
+      model: 'TravelPlan', // refers to table name
       key: 'travel_id', // refers to column name in referenced table
     }
   },
