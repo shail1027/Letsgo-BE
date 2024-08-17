@@ -1,33 +1,42 @@
 import express from 'express';
 import Candidate from '../models/Candidates.js';
 import Location from '../models/Location.js';
+import FavoriteList from '../models/FavoriteList.js';
 
 const router = express.Router();
 
-// 장소를 후보군 리스트에 추가하는 API
-router.post('/add', async (req, res) => {
-  const { location_id, list_id, user_id, travel_id } = req.body;
+// 새로운 후보지를 생성하는 API
+router.post('/candidates/new', async (req, res) => {
+  const { travel_id } = req.params;
+  const { location_id, favorit_id } = req.body;
 
   try {
-    // Location 정보 가져오기
-    const location = await Location.findOne({ where: { location_id } });
-    if (!location) {
-      return res.status(404).json({ error: 'Location not found' });
+    // Location 또는 FavoriteList에서 데이터 찾기
+    let location;
+    if (location_id) {
+      location = await Location.findOne({ where: { location_id } });
+    } else if (favorit_id) {
+      location = await FavoriteList.findOne({ where: { favorit_id } });
     }
 
-    // 후보군 리스트에 추가
+    if (!location) {
+      return res.status(404).json({ error: 'Location or Favorite not found' });
+    }
+
+    const candidateName = location.location_name || location.place_name || 'Default Name';
+
     const candidate = await Candidate.create({
-      location_id,
-      list_id,
-      user_id,
-      travel_id,
-      location_name: location.location_name,
-      location_address: location.location_address
+      can_name: candidateName,
+      location_id: location.location_id || null,
+      travel_id: travel_id,
+      user_id: location.user_id || null,
+      list_id: location.list_id || null
     });
 
-    res.status(201).json(candidate);
+    res.status(201).json({ message: 'Candidate created successfully', candidate });
   } catch (error) {
-    res.status(500).json({ error: 'An error occurred while adding to the candidate list' });
+    console.error('Error creating candidate:', error);
+    res.status(500).json({ error: 'An error occurred while creating the candidate' });
   }
 });
 

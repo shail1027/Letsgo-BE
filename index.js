@@ -18,6 +18,8 @@ import travelPlanRoutes from './src/routes/travelPlans.js';
 import makeRoomRoutes from './src/routes/makeRoomRoutes.js';
 import accommodationRoutes from './src/routes/accommodationRoutes.js';
 import inviteRoutes from './src/routes/inviteRoutes.js';
+import voteRouter from "./src/routes/vote.js";
+import addRoute from "./src/routes/addRoute.js";
 
 // 모델 파일들
 import './src/models/user.js';
@@ -31,6 +33,7 @@ import './src/models/accommodation.js';
 import './src/models/travelRoute.js';
 import './src/models/user_travelPlan.js';
 import './src/models/vote.js';
+import './src/models/voted.js';
 import './src/models/associations.js'; // 관계 설정 파일
 
 dotenv.config();
@@ -48,8 +51,14 @@ const io = new Server(server, {
   }
 });
 
-
 app.set('socketio', io);
+
+// 전역 헤더 설정
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Cache-Control', 'no-store'); // Cache-Control 설정
+  next();
+});
 
 app.use(cors()); 
 
@@ -110,11 +119,8 @@ app.use('/', travelPlanRoutes);
 app.use('/travel-plans', makeRoomRoutes);
 app.use('/travel-plans', accommodationRoutes);
 app.use('/', inviteRoutes);
-
-// `GET /` 요청에 대한 기본 응답을 설정합니다.
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+app.use("/travel-plans", voteRouter);
+app.use("/travel-plans", CandidateRoutes);
 
 // 라우터가 없는 경우에 대한 처리
 app.use((req, res, next) => {

@@ -1,6 +1,6 @@
 import express from 'express';
-import Vote from '../models/vote.js';
-import Candidate from '../models/Candidates.js';
+import TravelRoute from '../models/travelRoute.js';
+import Voted from '../models/voted.js';
 
 const router = express.Router();
 
@@ -25,19 +25,16 @@ router.post('/travel-plans/add-route', async (req, res) => {
       }
     }
 
-    // travel_id에 해당하는 모든 투표 결과를 가져오기
-    const votedLocations = await Voted.findAll({
-      where: { travel_id }
-    });
-
-    if (!votedLocations || votedLocations.length === 0) {
-      return res.status(404).json({ error: `No voted results found for travel_id ${travel_id}` });
-    }
-
     // 투표 결과 기반으로 동선에 추가
     if (routes && routes.length > 0) {
       for (const route of routes) {
-        const votedLocation = votedLocations.find(v => v.location_id === route.location_id && v.ranked === route.ranked);
+        const votedLocation = await Voted.findOne({
+          where: {
+            travel_id,
+            location_id: route.location_id,
+            ranked: route.ranked,
+          },
+        });
 
         if (votedLocation) {
           travelRoutes.push({
