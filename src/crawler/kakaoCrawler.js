@@ -5,7 +5,10 @@ import MyPlaceListMapping from '../models/MyPlaceListMapping.js';
 
 export const fetchKakaoBookmarkList = async (url) => {
     const options = new chrome.Options();
-    options.addArguments('--headless');
+    options.addArguments('--headless'); // 헤드리스 모드로 실행
+    options.addArguments('--no-sandbox'); // 샌드박스 비활성화
+    options.addArguments('--disable-dev-shm-usage'); // 공유 메모리 사용 비활성화
+    options.addArguments('--disable-gpu'); // GPU 사용 비활성화 (선택 사항)
 
     const driver = await new Builder().forBrowser('chrome').setChromeOptions(options).build();
     try {
