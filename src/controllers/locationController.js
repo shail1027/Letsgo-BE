@@ -1,6 +1,6 @@
 import Location from '../models/Location.js';
 import axios from 'axios';
-import cheerio from 'cheerio';
+import * as cheerio from 'cheerio';
 
 export const getLocationInfo = async (req, res) => {
     const { url, travel_id } = req.body;
