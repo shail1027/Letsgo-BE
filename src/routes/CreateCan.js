@@ -41,10 +41,13 @@ router.post('/candidates/new', async (req, res) => {
     const candidate = await Candidate.create({
       can_name: candidateName,
       location_id: location ? location.location_id : null,
-      travel_id: travel_id, // body에서 추출한 travel_id 사용
-      user_id: location ? location.user_id : favorite.user_id, // location 또는 favorite에서 user_id 가져오기
-      favorite_id: favorite ? favorite.favorit_id : null
-    });
+      travel_id: travel_id,
+      user_id: location ? location.user_id : favorite.user_id,
+      favorit_id: favorite ? favorite.favorit_id : null
+  });
+  
+  console.log('Created candidate:', candidate);
+  
 
     res.status(201).json({ message: 'Candidate created successfully', candidate });
   } catch (error) {
