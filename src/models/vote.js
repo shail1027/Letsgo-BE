@@ -51,6 +51,7 @@ const Vote = sequelize.define('Vote', {
   }
 });
 
+
 Vote.belongsTo(Candidate, { foreignKey: 'can_id' }); // foreignKey도 can_id로 변경
 Vote.belongsTo(User, { foreignKey: 'user_id' });
 Vote.belongsTo(TravelPlan, { foreignKey: 'travel_id' }); // travel_id를 TravelPlan 모델과 연관

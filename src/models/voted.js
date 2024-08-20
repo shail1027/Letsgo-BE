@@ -38,6 +38,14 @@ const Voted = sequelize.define('Voted', {
     },
     allowNull: true
   },
+  place_name: {  // 새로 추가된 필드
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  place_address: {  // 새로 추가된 필드
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
   ranked: {
     type: DataTypes.INTEGER,
   }

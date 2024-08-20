@@ -2,6 +2,9 @@ import express from 'express';
 import Vote from '../models/vote.js';
 import Candidate from '../models/Candidates.js';
 import Voted from '../models/voted.js'; // Voted 모델 가져오기
+import Location from "../models/Location.js";
+import FavoriteList from '../models/FavoriteList.js';
+import sequelize from '../../database.js';
 
 const router = express.Router();
 
@@ -58,32 +61,54 @@ router.post('/candidates/vote', async (req, res) => {
   }
 });
 
-// 투표 완료 후 Vote DB에서 vote_count 증가시키는 API
 router.post('/candidates/vote-complete', async (req, res) => {
-  const { user_id, can_id, can_name, travel_id } = req.body;
+  const { user_id, can_id, travel_id } = req.body;
 
   try {
-    // 투표 완료한 항목의 vote_count 증가
-    const vote = await Vote.findOne({
-      where: { can_name: can_name, can_id: can_id, travel_id: travel_id }
+    // 후보지 정보를 can_id를 통해 조회
+    const candidate = await Candidate.findOne({
+      where: { can_id: can_id, travel_id: travel_id }
     });
 
-    if (!vote) {
-      return res.status(404).json({ error: 'Vote record not found with the specified can_name, can_id, and travel_id.' });
+    if (!candidate) {
+      return res.status(404).json({ error: 'Candidate not found with the specified can_id and travel_id.' });
     }
 
-    // vote_count 증가
-    vote.vote_count += 1;
-    await vote.save();
+    let place_name, place_address;
 
-    res.status(201).json({ message: 'Vote count incremented successfully.' });
+    // location_id가 있는 경우
+    if (candidate.location_id) {
+      const location = await Location.findOne({ where: { location_id: candidate.location_id } });
+      place_name = location.location_name;
+      place_address = location.location_address;
+    }
+    // favorit_id가 있는 경우
+    else if (candidate.favorit_id) {
+      const favorite = await FavoriteList.findOne({ where: { favorit_id: candidate.favorit_id } });
+      place_name = favorite.place_name;
+      place_address = favorite.address;
+    }
+
+    // 투표 결과를 Voted 테이블에 저장
+    await Voted.create({
+      can_id: candidate.can_id,
+      location_id: candidate.location_id || null,
+      travel_id: travel_id,
+      user_id: user_id,
+      favorit_id: candidate.favorit_id || null,
+      ranked: 0,  // ranked는 나중에 계산
+      place_name: place_name,  // 장소 이름
+      place_address: place_address  // 장소 주소
+    });
+
+    // 성공 메시지 반환
+    res.status(201).json({ message: 'Vote completed and ranks updated successfully.' });
   } catch (error) {
     console.error('Error completing vote:', error);
     res.status(500).json({ error: 'An error occurred while completing the vote' });
   }
 });
 
-// 투표 결과를 조회하고 Voted DB에 ranked를 저장하는 API
 router.get('/candidates/vote-results/:travel_id/:can_name', async (req, res) => {
   const { travel_id, can_name } = req.params;
 
@@ -127,5 +152,4 @@ router.get('/candidates/vote-results/:travel_id/:can_name', async (req, res) => 
     res.status(500).json({ error: 'An error occurred while fetching the vote results' });
   }
 });
-
 export default router;
