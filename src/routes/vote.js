@@ -150,10 +150,17 @@ router.get('/candidates/vote-results/:travel_id', async (req, res) => {
       where: { travel_id: travel_id },
       attributes: [
         'can_name',
-        [sequelize.fn('SUM', sequelize.col('vote_count')), 'total_vote_count'],
-        'can_id'
+        'can_id',
+        [sequelize.fn('SUM', sequelize.col('vote_count')), 'total_vote_count']
       ],
-      group: ['can_name', 'can_id'],
+      include: [
+        {
+          model: Candidate,
+          attributes: ['location_id', 'favorit_id'],
+          required: true
+        }
+      ],
+      group: ['can_name', 'can_id', 'Candidate.location_id', 'Candidate.favorit_id'],
       order: [['can_name', 'ASC'], [sequelize.literal('total_vote_count'), 'DESC']],
       raw: true
     });
@@ -167,31 +174,36 @@ router.get('/candidates/vote-results/:travel_id', async (req, res) => {
     let rank = 1;
 
     for (let i = 0; i < allVotes.length; i++) {
-      const candidate = await Candidate.findOne({ where: { can_id: allVotes[i].can_id, travel_id: travel_id } });
+      const vote = allVotes[i];
 
-      if (candidate) {
-        // can_name이 바뀌면 rank를 1로 초기화
-        if (allVotes[i].can_name !== currentCanName) {
-          currentCanName = allVotes[i].can_name;
-          rank = 1;
-        }
-
-        // Voted 테이블에서 동일한 can_name과 can_id를 가진 행을 업데이트
-        await Voted.update(
-          {
-            ranked: rank // 투표 수가 많은 순서대로 rank를 설정
-          },
-          {
-            where: {
-              can_id: candidate.can_id,
-              can_name: candidate.can_name,
-              travel_id: travel_id
-            }
-          }
-        );
-
-        rank++; // 다음 순위로 증가
+      // can_name이 바뀌면 rank를 1로 초기화
+      if (vote.can_name !== currentCanName) {
+        currentCanName = vote.can_name;
+        rank = 1;
       }
+
+      // Voted 테이블에서 동일한 can_name과 can_id를 가진 행을 찾거나 생성
+      const [existingVoted, created] = await Voted.findOrCreate({
+        where: {
+          can_id: vote.can_id,
+          can_name: vote.can_name,
+          travel_id: travel_id
+        },
+        defaults: {
+          location_id: vote['Candidate.location_id'] || null,
+          favorit_id: vote['Candidate.favorit_id'] || null,
+          user_id: vote.user_id || 1,  // user_id를 기본값으로 설정 (예: 1)
+          ranked: rank // 초기 ranked 값 설정
+        }
+      });
+
+      // 이미 존재하는 경우 ranked 값 업데이트
+      if (!created) {
+        existingVoted.ranked = rank; // 순위 업데이트
+        await existingVoted.save();
+      }
+
+      rank++; // 다음 순위로 증가
     }
 
     // 최신 투표 결과 반환 (Voted 테이블에서 가져옴)
@@ -216,6 +228,8 @@ router.get('/candidates/vote-results/:travel_id', async (req, res) => {
     res.status(500).json({ error: 'An error occurred while fetching the vote results' });
   }
 });
+
+
 
 
 export default router;
