@@ -25,6 +25,10 @@ const Vote = sequelize.define('Vote', {
       key: 'user_id'
     }
   },
+  vote_count: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0 // 투표 수의 기본값을 0으로 설정
+  },
   travel_id: {
     type: DataTypes.INTEGER,
     allowNull: false,

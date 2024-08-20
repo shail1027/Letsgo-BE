@@ -4,6 +4,7 @@ import Location from './Location.js';         // Location 모델을 불러옵니
 import TravelPlan from './travelPlan.js';     // TravelPlan 모델을 불러옵니다.
 import User from './user.js';                 // User 모델을 불러옵니다.
 import FavoriteList from './FavoriteList.js';
+import Voted from './voted.js';
 
 const Candidate = sequelize.define('Candidate', {
   can_id: {
@@ -47,6 +48,7 @@ const Candidate = sequelize.define('Candidate', {
   tableName: 'candidates',
   timestamps: false
 });
+
 
 // 모델 간의 관계 설정
 Candidate.belongsTo(Location, { foreignKey: 'location_id' });

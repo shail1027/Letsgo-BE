@@ -3,6 +3,7 @@ import sequelize from '../../database.js';
 import Location from './Location.js';
 import FavoritList from './FavoriteList.js';
 
+
 const Voted = sequelize.define('Voted', {
     vote_id: {
         type: DataTypes.INTEGER,
@@ -45,7 +46,7 @@ const Voted = sequelize.define('Voted', {
     timestamps: false
   });
 
-// 모델 관계 설정
+
 Voted.belongsTo(Location, { foreignKey: 'location_id' });
 Voted.belongsTo(FavoritList, { foreignKey: 'favorit_id' });
 
