@@ -36,6 +36,7 @@ import './src/models/vote.js';
 import './src/models/voted.js';
 import './src/models/associations.js'; // 관계 설정 파일
 
+
 dotenv.config();
 
 // ESM 환경에서 __dirname 대체
@@ -121,6 +122,7 @@ app.use('/travel-plans', accommodationRoutes);
 app.use('/', inviteRoutes);
 app.use("/travel-plans", voteRouter);
 app.use("/travel-plans", CandidateRoutes);
+app.use("/travel", addRoute);
 
 // 라우터가 없는 경우에 대한 처리
 app.use((req, res, next) => {
