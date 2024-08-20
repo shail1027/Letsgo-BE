@@ -182,6 +182,24 @@ router.get('/candidates/vote-results/:travel_id', async (req, res) => {
         rank = 1;
       }
 
+      // 장소 이름과 주소를 가져옴
+      let place_name = '';
+      let place_address = '';
+
+      if (vote['Candidate.location_id']) {
+        const location = await Location.findOne({ where: { location_id: vote['Candidate.location_id'] } });
+        if (location) {
+          place_name = location.location_name;
+          place_address = location.location_address;
+        }
+      } else if (vote['Candidate.favorit_id']) {
+        const favorite = await FavoriteList.findOne({ where: { favorit_id: vote['Candidate.favorit_id'] } });
+        if (favorite) {
+          place_name = favorite.place_name;
+          place_address = favorite.address;
+        }
+      }
+
       // Voted 테이블에서 동일한 can_name과 can_id를 가진 행을 찾거나 생성
       const [existingVoted, created] = await Voted.findOrCreate({
         where: {
@@ -192,14 +210,18 @@ router.get('/candidates/vote-results/:travel_id', async (req, res) => {
         defaults: {
           location_id: vote['Candidate.location_id'] || null,
           favorit_id: vote['Candidate.favorit_id'] || null,
-          user_id: vote.user_id || 1,  // user_id를 기본값으로 설정 (예: 1)
-          ranked: rank // 초기 ranked 값 설정
+          user_id: 1, // 기본 user_id를 설정 (예: 1)
+          ranked: rank, // 초기 ranked 값 설정
+          place_name: place_name,
+          place_address: place_address
         }
       });
 
-      // 이미 존재하는 경우 ranked 값 업데이트
+      // 이미 존재하는 경우 ranked 값 및 장소 정보 업데이트
       if (!created) {
         existingVoted.ranked = rank; // 순위 업데이트
+        existingVoted.place_name = place_name;
+        existingVoted.place_address = place_address;
         await existingVoted.save();
       }
 
@@ -228,8 +250,6 @@ router.get('/candidates/vote-results/:travel_id', async (req, res) => {
     res.status(500).json({ error: 'An error occurred while fetching the vote results' });
   }
 });
-
-
 
 
 export default router;
