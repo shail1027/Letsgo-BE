@@ -26,13 +26,13 @@ const TravelRoute = sequelize.define('TravelRoute', {
       key: 'acc_id'
     }
   },
-  location_id: {
-    type: DataTypes.INTEGER,
-    allowNull: true, // Location이 없을 수도 있으므로 null을 허용합니다.
-    references: {
-      model: Location,
-      key: 'location_id'
-    }
+  place_name: {
+    type: DataTypes.STRING,
+    allowNull: true // 투표 결과에서 가져온 장소 이름을 저장합니다.
+  },
+  place_address: {
+    type: DataTypes.STRING,
+    allowNull: true // 투표 결과에서 가져온 장소 주소를 저장합니다.
   },
   route_title: {
     type: DataTypes.STRING,
@@ -55,7 +55,7 @@ TravelRoute.belongsTo(TravelPlan, { foreignKey: 'travel_id' });
 Accommodations.hasMany(TravelRoute, { foreignKey: 'acc_id' });
 TravelRoute.belongsTo(Accommodations, { foreignKey: 'acc_id' });
 
-Location.hasMany(TravelRoute, { foreignKey: 'location_id' });
-TravelRoute.belongsTo(Location, { foreignKey: 'location_id' });
+// Location.hasMany(TravelRoute, { foreignKey: 'location_id' });
+// TravelRoute.belongsTo(Location, { foreignKey: 'location_id' });
 
 export default TravelRoute;
