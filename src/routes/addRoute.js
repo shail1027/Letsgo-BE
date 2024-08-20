@@ -93,4 +93,30 @@ router.post('/travel-plans/add-route', async (req, res) => {
   }
 });
 
+// 동선을 route_title별로 조회하는 API
+router.get('/travel-plans/routes/:travel_id/:route_title', async (req, res) => {
+  const { travel_id, route_title } = req.params;
+
+  try {
+    // TravelRoute 테이블에서 해당 travel_id와 route_title에 해당하는 동선을 조회
+    const routes = await TravelRoute.findAll({
+      where: { travel_id: travel_id, route_title: route_title },
+      order: [['route_order', 'ASC']]  // route_order 순으로 정렬
+    });
+
+    if (routes.length === 0) {
+      return res.status(404).json({ message: `No routes found for travel_id ${travel_id} and route_title ${route_title}.` });
+    }
+
+    res.status(200).json({
+      message: `Routes for route_title ${route_title} retrieved successfully.`,
+      routes: routes
+    });
+  } catch (error) {
+    console.error('Error retrieving travel routes:', error);
+    res.status(500).json({ error: 'An error occurred while retrieving the travel routes' });
+  }
+});
+
+
 export default router;
